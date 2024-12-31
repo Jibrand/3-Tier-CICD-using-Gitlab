@@ -1,0 +1,27 @@
+stages:
+  - build
+  - deploy
+  - cleanup
+
+build:
+  stage: build
+  image: node:14
+  script:
+    - echo "Building the MERN app..."
+    - npm install
+
+deploy:
+  stage: deploy
+  image: node:14
+  script:
+    - echo "Deploying application to EC2..."
+    
+    - ssh -o StrictHostKeyChecking=no -i $AWS_SSH_KEY_PATH ec2-user@$EC2_IP <<EOF
+        cd /path/to/backend
+        git pull origin master
+        npm install
+        pm2 restart 0
+        exit
+      EOF
+
+ 

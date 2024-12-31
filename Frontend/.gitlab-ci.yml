@@ -1,0 +1,31 @@
+stages:
+  - build
+  - deploy
+  - cleanup
+
+build:
+  stage: build
+  image: node:14
+  script:
+    - echo "Building the MERN app..."
+    - npm install
+    - npm run build   
+
+deploy:
+  stage: deploy
+  image: node:14
+  script:
+    - echo "Deploying application to EC2..."
+    
+    - ssh -o StrictHostKeyChecking=no -i $AWS_SSH_KEY_PATH ec2-user@$EC2_IP <<EOF
+        echo "Deploying frontend..."
+        
+        sudo rm -rf /var/www/html/*
+
+        sudo cp -r /home/ubuntu/actions-runner/_work/myproject/myproject/dist/* /var/www/html/
+
+        sudo service apache2 restart
+        exit
+      EOF
+
+ 
